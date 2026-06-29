@@ -1,0 +1,40 @@
+name: Shared Submodule Updater
+
+on:
+  workflow_call:
+    inputs:
+      parent_repo:
+        required: true
+        type: string
+      submodule_list:
+        required: true
+        type: string
+      base_branch:
+        required: false
+        type: string
+        default: 'main'
+    secrets:
+      PAT_TOKEN:
+        required: true
+
+jobs:
+  execute-update:
+    runs-on: linux
+    steps:
+      - name: Checkout DevOps Toolkit
+        uses: actions/checkout@v4
+        with:
+          repository: my-org/central-devops
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run API Update Script
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PARENT_REPO: ${{ inputs.parent_repo }}
+          SUBMODULE_LIST: ${{ inputs.submodule_list }}
+          BASE_BRANCH: ${{ inputs.base_branch }}
+        run: python scripts/api_update_submodule.py

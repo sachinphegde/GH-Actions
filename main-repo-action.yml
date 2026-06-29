@@ -1,0 +1,21 @@
+name: Bulk Check Submodule Updates
+
+on:
+  workflow_dispatch:
+    inputs:
+      submodules_to_update:
+        description: 'Comma-separated paths of submodules to update (e.g., path/a,path/b)'
+        required: true
+        type: string
+        default: 'libs/auth,libs/logger'
+
+jobs:
+  call-central-updater:
+    uses: my-org/central-devops/.github/workflows/update-submodule.yml@main
+    with:
+      parent_repo: ${{ github.repository }}
+      # Pass the list string directly to the reusable workflow
+      submodule_list: ${{ github.event.inputs.submodules_to_update }}
+      base_branch: "main"
+    secrets:
+      PAT_TOKEN: ${{ secrets.DEPENDENCY_UPDATER_PAT }}
